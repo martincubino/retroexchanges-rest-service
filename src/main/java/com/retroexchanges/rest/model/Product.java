@@ -49,7 +49,6 @@ public class Product implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy="product")
     @OrderBy("pictureId ASC")
     private List<ProductPicture> productPictures;
-
 	
 	public List<ProductPicture> getLabelList() {
 		return productPictures;

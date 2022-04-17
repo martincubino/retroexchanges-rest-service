@@ -20,7 +20,7 @@ allowGetters = true)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long categoryId;
 
     @NotBlank
     private String name;
@@ -31,12 +31,12 @@ public class Category {
     private Byte[] image;
 
 
-    public Long getId() {
-        return id;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCategoryId(Long id) {
+        this.categoryId = id;
     }
 
     public String getName() {

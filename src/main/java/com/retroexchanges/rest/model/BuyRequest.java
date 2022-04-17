@@ -32,13 +32,10 @@ public class BuyRequest implements Serializable{
     private String seller;
     
     @NotBlank
-    private Long produtId;
+    private Long productId;
     
     @NotBlank
     private Double price;
-    
-    @NotBlank
-    private Long categoryId;
     
     @NotBlank
     private RequestStatus status;
@@ -82,12 +79,12 @@ public class BuyRequest implements Serializable{
 		this.seller = seller;
 	}
 
-	public Long getProdutId() {
-		return produtId;
+	public Long getProductId() {
+		return productId;
 	}
 
 	public void setProdutId(Long produtId) {
-		this.produtId = produtId;
+		this.productId = produtId;
 	}
 
 	public void setId(Long requestId) {
