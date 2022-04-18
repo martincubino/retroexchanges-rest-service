@@ -3,13 +3,19 @@ package com.retroexchanges.rest.controller;
 import com.retroexchanges.rest.exception.ResourceNotFoundException;
 import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.repository.CategoryRepository;
+import com.retroexchanges.rest.json.CategoryDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import javax.validation.Valid;
+
+import java.io.IOException;
 import java.util.List;
+
+
 
 @RestController
 @RequestMapping("/api")
@@ -24,8 +30,12 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    public Category createCategory(@Valid @RequestBody Category category) {
-        return categoryRepository.save(category);
+    public Category createCategory(@ModelAttribute CategoryDTO categoryDTO) throws IOException {
+        Category c = new Category();
+        c.setName(categoryDTO.getName());
+        c.setDescription(categoryDTO.getDescription());
+        c.setImage(categoryDTO.getLogo().getBytes());
+    	return categoryRepository.save(c);
     }
 
     @GetMapping("/category/{id}")

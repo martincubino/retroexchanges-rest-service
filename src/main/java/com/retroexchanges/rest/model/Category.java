@@ -28,7 +28,7 @@ public class Category {
     private String description;
 
     @Lob
-    private Byte[] image;
+    private byte[] image;
 
 
     public Long getCategoryId() {
@@ -55,11 +55,11 @@ public class Category {
         this.description = description;
     }
     
-    public Byte[] getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(Byte[] image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
     
