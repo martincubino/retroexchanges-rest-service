@@ -45,15 +45,14 @@ public class CategoryController {
     }
 
     @PutMapping("/category/{id}")
-    public Category updateNote(@PathVariable(value = "id") Long categoryId,
-                                           @Valid @RequestBody Category categoryDetails) {
-
+    public Category updateNote(@ModelAttribute CategoryDTO categoryDTO,@PathVariable(value = "id") Long categoryId) throws IOException  {
+    	
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
 
-        category.setName(categoryDetails.getName());
-        category.setDescription(categoryDetails.getDescription());
-        category.setImage(categoryDetails.getImage());
+        category.setName(categoryDTO.getName());
+        category.setDescription(categoryDTO.getDescription());
+        category.setImage(categoryDTO.getLogo().getBytes());
 
         Category updatedCategory = categoryRepository.save(category);
         return updatedCategory;

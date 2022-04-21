@@ -62,6 +62,31 @@ public class UserController {
 		}
 		return userToken;
 	}
+	@PostMapping("/logout")
+	public UserToken logout(@RequestBody Login login) {
+		
+		User user = userRepository.findById(login.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User", "email", login.getEmail()));
+		
+		String email = user.getEmail();
+		String password = user.getPassword();
+		String login_password = login.getPassword(); 
+		
+		UserToken userToken = new UserToken();
+		
+		if (password.equals(login_password))
+		{
+			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+			String token = authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
+			
+			
+			userToken.setEmail(email);
+			userToken.setToken(token);
+			
+			userToken = userTokenRepository.save(userToken);
+			
+		}
+		return userToken;
+	}
 	
 	
     @GetMapping("/users")

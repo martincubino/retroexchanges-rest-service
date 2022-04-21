@@ -33,6 +33,7 @@ public class RetroexchangesRestApplication {
 				.antMatchers(HttpMethod.POST, "/api/category").hasRole("ADMIN")
 				.antMatchers(HttpMethod.POST, "/api/login").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/register").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/logout").permitAll()
 				.anyRequest().authenticated();
 		}
 	}
