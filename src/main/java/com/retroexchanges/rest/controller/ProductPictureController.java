@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class ProductPictureController {
 
-    @Autowired
+    /*@Autowired
     ProductRepository productRepository;
 
     @GetMapping("/products")
@@ -68,5 +68,5 @@ public class ProductPictureController {
         productRepository.delete(product);
 
         return ResponseEntity.ok().build();
-    }
+    }*/
 }

@@ -108,7 +108,7 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 				// El token dura 24 horas
 				.setExpiration(new Date(System.currentTimeMillis() + (3600000 * 24))) 
 				.signWith(SignatureAlgorithm.HS512,SECRET.getBytes()).compact();
-		return "Bearer " + token;
+		return token;
 	}
 
 

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin("http://localhost:8081")
 public class UserController {
 
     @Autowired
@@ -37,6 +38,7 @@ public class UserController {
     @Autowired
     UserTokenRepository userTokenRepository;
     
+        
 	@PostMapping("/login")
 	public UserToken login(@RequestBody Login login) {
 		
@@ -51,40 +53,27 @@ public class UserController {
 		if (password.equals(login_password))
 		{
 			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
-			String token = authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
 			
+			String token = authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
 			
 			userToken.setEmail(email);
 			userToken.setToken(token);
-			
 			userToken = userTokenRepository.save(userToken);
-			
+		}
+		
+		List<UserToken> expiredTokens = userTokenRepository.findExpirated();		
+		
+		for (int i=0;i<expiredTokens.size();i++) {
+			UserToken u = expiredTokens.get(i);
+			userTokenRepository.delete(u);
 		}
 		return userToken;
 	}
 	@PostMapping("/logout")
-	public UserToken logout(@RequestBody Login login) {
-		
-		User user = userRepository.findById(login.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User", "email", login.getEmail()));
-		
-		String email = user.getEmail();
-		String password = user.getPassword();
-		String login_password = login.getPassword(); 
-		
-		UserToken userToken = new UserToken();
-		
-		if (password.equals(login_password))
-		{
-			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
-			String token = authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
-			
-			
-			userToken.setEmail(email);
-			userToken.setToken(token);
-			
-			userToken = userTokenRepository.save(userToken);
-			
-		}
+	public UserToken logout(@RequestHeader("authorization") String token) {
+ 		UserToken userToken = userTokenRepository.findById(token)
+        .orElseThrow(() -> new ResourceNotFoundException("UserToken", "token", token));
+ 		userTokenRepository.delete(userToken);
 		return userToken;
 	}
 	

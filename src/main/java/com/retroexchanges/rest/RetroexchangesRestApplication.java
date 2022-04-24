@@ -30,10 +30,11 @@ public class RetroexchangesRestApplication {
 			http.csrf().disable()
 				.addFilterAfter(new RetroexchangesAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.authorizeRequests()
+				.antMatchers(HttpMethod.GET, "/api/users").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/category").hasRole("ADMIN")
 				.antMatchers(HttpMethod.POST, "/api/login").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/register").permitAll()
-				.antMatchers(HttpMethod.POST, "/api/logout").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/logout").hasRole("USER")
 				.anyRequest().authenticated();
 		}
 	}
