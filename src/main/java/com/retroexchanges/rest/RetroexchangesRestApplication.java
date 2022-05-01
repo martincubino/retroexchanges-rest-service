@@ -33,9 +33,9 @@ public class RetroexchangesRestApplication {
 				.addFilterAfter(new RetroexchangesAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.authorizeRequests()
 				.antMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+				.antMatchers(HttpMethod.POST, "/api/logout").hasRole("USER")
 				.antMatchers(HttpMethod.POST, "/api/login").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/register").permitAll()
-				.antMatchers(HttpMethod.POST, "/api/logout").hasRole("USER")
 				.antMatchers(HttpMethod.GET, "/api/categories").permitAll()
 				.anyRequest().authenticated();
 			
