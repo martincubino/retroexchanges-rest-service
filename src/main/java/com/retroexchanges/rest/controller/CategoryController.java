@@ -5,6 +5,7 @@ import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.repository.CategoryRepository;
 import com.retroexchanges.rest.json.CategoryDTO;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:8081/#/", maxAge = 3600)
 public class CategoryController {
 
     @Autowired
     CategoryRepository categoryRepository;
-
+    
+    @CrossOrigin(origins = "*")
     @GetMapping("/categories")
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
