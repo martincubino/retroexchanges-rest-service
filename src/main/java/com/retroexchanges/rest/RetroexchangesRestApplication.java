@@ -38,7 +38,6 @@ public class RetroexchangesRestApplication {
 				.antMatchers(HttpMethod.POST, "/api/register").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/categories").permitAll()
 				.anyRequest().authenticated();
-			
 		}
 	
 	
