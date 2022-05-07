@@ -1,13 +1,14 @@
 package com.retroexchanges.rest.controller;
 
 import com.retroexchanges.rest.enumeration.ProductStatus;
-import com.retroexchanges.rest.exception.ResourceNotFoundException;
+import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.model.Product;
 import com.retroexchanges.rest.repository.ProductRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +40,8 @@ public class ProductController {
     @GetMapping("/product/{id}")
     public Product getProductById(@PathVariable(value = "id") Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
+        		.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
+        
     }
 
     @PutMapping("/product/{id}")
@@ -47,7 +49,7 @@ public class ProductController {
                                            @Valid @RequestBody Product productDetails) {
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
+        		.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
 
         product.setName(productDetails.getName());
         product.setDescription(productDetails.getDescription());
@@ -63,7 +65,7 @@ public class ProductController {
     @DeleteMapping("/product/{id}")
     public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
+        		.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
 
         productRepository.delete(product);
 

@@ -20,7 +20,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"createAt", "updatedAt"},
+@JsonIgnoreProperties(value = {"status","isAdmin","createAt", "updatedAt"},
 allowGetters = true)
 public class User implements Serializable{
 	
@@ -46,7 +46,7 @@ public class User implements Serializable{
     @Enumerated(EnumType.ORDINAL)
     private UserStatus status;
     
-    private boolean isAdmin;
+    private boolean isAdmin = false;
     
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

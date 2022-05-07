@@ -1,9 +1,11 @@
 package com.retroexchanges.rest.controller;
 
-import com.retroexchanges.rest.exception.ResourceNotFoundException;
+import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.repository.CategoryRepository;
+import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.json.CategoryDTO;
+import org.springframework.http.HttpStatus;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +46,14 @@ public class CategoryController {
     @GetMapping("/category/{id}")
     public Category getCategoryById(@PathVariable(value = "id") Long categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+                .orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",categoryId)));
     }
 
     @PutMapping("/category/{id}")
     public Category updateNote(@ModelAttribute CategoryDTO categoryDTO,@PathVariable(value = "id") Long categoryId) throws IOException  {
     	
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+        		.orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",categoryId)));
 
         category.setName(categoryDTO.getName());
         category.setDescription(categoryDTO.getDescription());
@@ -64,7 +66,7 @@ public class CategoryController {
     @DeleteMapping("/category/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable(value = "id") Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+        		.orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",categoryId)));
 
         categoryRepository.delete(category);
 

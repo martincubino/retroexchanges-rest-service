@@ -1,7 +1,8 @@
 package com.retroexchanges.rest.controller;
 
 import com.retroexchanges.rest.enumeration.UserStatus;
-import com.retroexchanges.rest.exception.ResourceNotFoundException;
+import com.retroexchanges.rest.exception.RecordNotFoundException;
+import com.retroexchanges.rest.exception.RecordAlreadyExistException;
 import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.model.User;
 import com.retroexchanges.rest.model.UserToken;
@@ -9,6 +10,7 @@ import com.retroexchanges.rest.repository.UserRepository;
 import com.retroexchanges.rest.repository.UserTokenRepository;
 import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.security.*;
+import org.springframework.http.HttpStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
@@ -42,7 +44,8 @@ public class UserController {
 	@PostMapping("/login")
 	public UserToken login(@RequestBody Login login) {
 		
-		User user = userRepository.findById(login.getEmail()).orElseThrow(() -> new ResourceNotFoundException("User", "email", login.getEmail()));
+		User user = userRepository.findById(login.getEmail()).orElseThrow(() -> 
+			new RecordNotFoundException(String.format("User %s not found",login.getEmail())));
 		
 		String email = user.getEmail();
 		String password = user.getPassword();
@@ -69,14 +72,6 @@ public class UserController {
 		}
 		return userToken;
 	}
-	@PostMapping("/logout")
-	public UserToken logout(@RequestHeader("authorization") String token) {
- 		UserToken userToken = userTokenRepository.findById(token)
-        .orElseThrow(() -> new ResourceNotFoundException("UserToken", "token", token));
- 		userTokenRepository.delete(userToken);
-		return userToken;
-	}
-	
 	
     @GetMapping("/users")
     public List<User> getAllUsers() {
@@ -85,21 +80,25 @@ public class UserController {
 
     @PostMapping("/register")
     public User createUser(@Valid @RequestBody User user) {
+    	User userInDatabase = userRepository.findById(user.getEmail()).get();
+    	if (userInDatabase!=null) {
+    		throw new RecordAlreadyExistException(String.format("User %s already exist",userInDatabase.getEmail()));
+    	}
         return userRepository.save(user);
     }
 
     @GetMapping("/user/{email}")
     public User getUserById(@PathVariable(value = "email") String email) {
-        return userRepository.findById(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        return userRepository.findById(email).orElseThrow(() -> 
+        new RecordNotFoundException(String.format("User %s not found",email)));
     }
 
     @PutMapping("/user/{email}")
     public User updateUser(@PathVariable(value = "email") String email,
                                            @Valid @RequestBody User userDetails) {
 
-        User user = userRepository.findById(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        User user = userRepository.findById(email).orElseThrow(() -> 
+        	new RecordNotFoundException(String.format("User %s not found",email)));
 
         user.setName(userDetails.getName());
         user.setSurname(userDetails.getSurname());
@@ -115,8 +114,8 @@ public class UserController {
 
     @DeleteMapping("/user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable(value = "email") String email) {
-        User user = userRepository.findById(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+        User user = userRepository.findById(email).orElseThrow(() -> 
+        	new RecordNotFoundException(String.format("User %s not found",email)));
 
         userRepository.delete(user);
 

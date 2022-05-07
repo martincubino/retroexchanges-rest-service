@@ -32,11 +32,15 @@ public class RetroexchangesRestApplication {
 			http.cors().and().csrf().disable()
 				.addFilterAfter(new RetroexchangesAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
 				.authorizeRequests()
+				.antMatchers(HttpMethod.GET, "/api/category/*").permitAll()
+				.antMatchers(HttpMethod.GET, "/api/product/*").permitAll()
+				.antMatchers(HttpMethod.GET, "/api/products").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
 				.antMatchers(HttpMethod.POST, "/api/logout").hasRole("USER")
 				.antMatchers(HttpMethod.POST, "/api/login").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/register").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/categories").permitAll()
+				
 				.anyRequest().authenticated();
 		}
 	

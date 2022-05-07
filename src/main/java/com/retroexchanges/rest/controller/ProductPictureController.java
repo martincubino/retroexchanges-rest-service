@@ -1,13 +1,14 @@
 package com.retroexchanges.rest.controller;
 
 import com.retroexchanges.rest.enumeration.ProductStatus;
-import com.retroexchanges.rest.exception.ResourceNotFoundException;
+import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.model.Product;
 import com.retroexchanges.rest.repository.ProductRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

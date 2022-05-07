@@ -26,6 +26,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.GrantedAuthority;
 
+
 public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 
 	private final String HEADER = "Authorization";
@@ -58,10 +59,9 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 
 	private Claims validateToken(HttpServletRequest request) {
 		try {
-		String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
-		return Jwts.parserBuilder().setSigningKey(SECRET.getBytes()).build().parseClaimsJws(jwtToken).getBody();
+			String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
+			return Jwts.parserBuilder().setSigningKey(SECRET.getBytes()).build().parseClaimsJws(jwtToken).getBody();
 		}catch(JwtException  ex) {
-			
 		}
 		return null;
 	}
