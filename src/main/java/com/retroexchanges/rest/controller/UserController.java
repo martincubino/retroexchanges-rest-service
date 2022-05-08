@@ -25,7 +25,9 @@ import javax.validation.Valid;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 
 @RestController
@@ -39,8 +41,9 @@ public class UserController {
 	@PostMapping("/login")
 	public UserToken login(@RequestBody Login login) {
 		
-		User user = userRepository.findById(login.getEmail()).orElseThrow(() -> 
-			new RecordNotFoundException(String.format("User %s not found",login.getEmail())));
+		String username = login.getEmail();
+		User user = userRepository.findById(username).orElseThrow(() -> 
+				new RecordNotFoundException(String.format("User %s not found",username)));
 		
 		String email = user.getEmail();
 		String password = user.getPassword();
@@ -65,7 +68,17 @@ public class UserController {
 
     @PostMapping("/register")
     public User createUser(@Valid @RequestBody User user) {
-    	User userInDatabase = userRepository.findById(user.getEmail()).get();
+    	
+    	User userInDatabase = null;
+    	try {
+    		Optional<User> u = userRepository.findById(user.getEmail());
+    		if (!u.isEmpty()) {
+    			userInDatabase= u.get();
+    		}
+    			
+    	}catch(Exception ex) {
+    		
+    	}
     	User newUser = new User();
     	if (userInDatabase!=null) {
     		throw new RecordAlreadyExistException(String.format("User %s already exist",userInDatabase.getEmail()));
