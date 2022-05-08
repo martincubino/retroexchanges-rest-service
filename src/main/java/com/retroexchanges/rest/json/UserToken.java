@@ -1,4 +1,4 @@
-package com.retroexchanges.rest.model;
+package com.retroexchanges.rest.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.retroexchanges.rest.enumeration.*;
@@ -16,27 +16,18 @@ import java.io.Serializable;
 /**
  * Created by fjmartincubino
  */
-@Entity
-@Table(name = "user_tokens")
-@EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"createAt"},
-allowGetters = true)
+
 public class UserToken implements Serializable{
 	
 	private static final long serialVersionUID = -234788421164359378L;
 
-	@Id
-	@Column(length = 200)
     private String token;
 
-	@NotBlank
-	@Column(length = 500)
     private String email;
 	    
-    @Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreatedDate
     private Date createAt;
+    
+    private Date expirationAt;
 
     public String getToken() {
 		return token;
@@ -52,6 +43,22 @@ public class UserToken implements Serializable{
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public void setCreateAt(Date createAt) {
+		this.createAt = createAt;
+	}
+	
+	public Date getCreateAt() {
+		return this.createAt;
+	}
+	
+	public void setExpirationAt(Date expirationAt) {
+		this.expirationAt = expirationAt;
+	}
+	
+	public Date getExpirationAt() {
+		return this.expirationAt;
 	}
 
 }

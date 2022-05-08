@@ -4,10 +4,9 @@ import com.retroexchanges.rest.enumeration.UserStatus;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.exception.RecordAlreadyExistException;
 import com.retroexchanges.rest.json.Login;
+import com.retroexchanges.rest.json.UserToken;
 import com.retroexchanges.rest.model.User;
-import com.retroexchanges.rest.model.UserToken;
 import com.retroexchanges.rest.repository.UserRepository;
-import com.retroexchanges.rest.repository.UserTokenRepository;
 import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.security.*;
 import org.springframework.http.HttpStatus;
@@ -37,10 +36,6 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
     
-    @Autowired
-    UserTokenRepository userTokenRepository;
-    
-        
 	@PostMapping("/login")
 	public UserToken login(@RequestBody Login login) {
 		
@@ -51,26 +46,16 @@ public class UserController {
 		String password = user.getPassword();
 		String login_password = login.getPassword(); 
 		
-		UserToken userToken = new UserToken();
-		
 		if (password.equals(login_password))
 		{
 			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
 			
-			String token = authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
+			UserToken userToken= authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
 			
-			userToken.setEmail(email);
-			userToken.setToken(token);
-			userToken = userTokenRepository.save(userToken);
+			return userToken;
 		}
 		
-		List<UserToken> expiredTokens = userTokenRepository.findExpirated();		
-		
-		for (int i=0;i<expiredTokens.size();i++) {
-			UserToken u = expiredTokens.get(i);
-			userTokenRepository.delete(u);
-		}
-		return userToken;
+		return null;
 	}
 	
     @GetMapping("/users")
@@ -81,10 +66,18 @@ public class UserController {
     @PostMapping("/register")
     public User createUser(@Valid @RequestBody User user) {
     	User userInDatabase = userRepository.findById(user.getEmail()).get();
+    	User newUser = new User();
     	if (userInDatabase!=null) {
     		throw new RecordAlreadyExistException(String.format("User %s already exist",userInDatabase.getEmail()));
+    	}else {
+    		newUser.setEmail(user.getEmail());
+    		newUser.setPassword(user.getPassword());
+    		newUser.setName(user.getName());
+    		newUser.setSurname(user.getSurname());
+    		newUser.setStatus(UserStatus.ACTIVE);
+    		newUser.setIsAdmin(false);
     	}
-        return userRepository.save(user);
+        return userRepository.save(newUser);
     }
 
     @GetMapping("/user/{email}")

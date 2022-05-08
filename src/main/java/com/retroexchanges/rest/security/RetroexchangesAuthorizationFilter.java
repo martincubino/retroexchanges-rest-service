@@ -26,6 +26,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.retroexchanges.rest.json.UserToken;
+
 
 public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 
@@ -88,13 +90,16 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 		return true;
 	}
 	
-	public String getJWTToken(String username, boolean isAdmin) {
+	public UserToken getJWTToken(String username, boolean isAdmin) {
 				
 		List<GrantedAuthority> grantedAuthorities= AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
 		
 		if (isAdmin == true) {
 			grantedAuthorities= AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN");
 		}
+		
+		Date createAt = new Date(System.currentTimeMillis());
+		Date expirationAt = new Date(createAt.getTime()+ + (3600000 * 24));
 		
 		String token = Jwts
 				.builder()
@@ -104,11 +109,19 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 						grantedAuthorities.stream()
 								.map(GrantedAuthority::getAuthority)
 								.collect(Collectors.toList()))
-				.setIssuedAt(new Date(System.currentTimeMillis()))
+				.setIssuedAt(createAt)
 				// El token dura 24 horas
-				.setExpiration(new Date(System.currentTimeMillis() + (3600000 * 24))) 
+				.setExpiration(expirationAt) 
 				.signWith(SignatureAlgorithm.HS512,SECRET.getBytes()).compact();
-		return token;
+		
+		UserToken ut = new UserToken();
+		
+		ut.setToken(token);
+		ut.setCreateAt(createAt);
+		ut.setExpirationAt(expirationAt);
+		ut.setEmail(username);
+		
+		return ut;
 	}
 
 
