@@ -118,7 +118,7 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 		
 		ut.setToken(token);
 		ut.setCreateAt(createAt);
-		ut.setExpirationAt(expirationAt);
+		ut.setExpirateAt(expirationAt);
 		ut.setEmail(username);
 		
 		return ut;

@@ -27,7 +27,7 @@ public class UserToken implements Serializable{
 	    
     private Date createAt;
     
-    private Date expirationAt;
+    private Date expirateAt;
 
     public String getToken() {
 		return token;
@@ -53,12 +53,12 @@ public class UserToken implements Serializable{
 		return this.createAt;
 	}
 	
-	public void setExpirationAt(Date expirationAt) {
-		this.expirationAt = expirationAt;
+	public void setExpirateAt(Date expirateAt) {
+		this.expirateAt = expirateAt;
 	}
 	
-	public Date getExpirationAt() {
-		return this.expirationAt;
+	public Date getExpirateAt() {
+		return this.expirateAt;
 	}
 
 }

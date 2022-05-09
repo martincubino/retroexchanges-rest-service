@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public User createUser(@Valid @RequestBody User user) {
+    public UserToken createUser(@Valid @RequestBody User user) {
     	
     	User userInDatabase = null;
     	try {
@@ -90,7 +90,14 @@ public class UserController {
     		newUser.setStatus(UserStatus.ACTIVE);
     		newUser.setIsAdmin(false);
     	}
-        return userRepository.save(newUser);
+    	
+    	userRepository.save(newUser);
+    	
+    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+		
+		UserToken userToken = authorization.getJWTToken(newUser.getEmail(),newUser.getIsAdmin());
+		
+		return userToken;
     }
 
     @GetMapping("/user/{email}")
