@@ -3,6 +3,7 @@ package com.retroexchanges.rest.controller;
 import com.retroexchanges.rest.enumeration.UserStatus;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.exception.RecordAlreadyExistException;
+import com.retroexchanges.rest.exception.AuthenticationErrorException;
 import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.json.UserToken;
 import com.retroexchanges.rest.model.User;
@@ -56,9 +57,10 @@ public class UserController {
 			UserToken userToken= authorization.getJWTToken(user.getEmail(),user.getIsAdmin());
 			
 			return userToken;
+			
+		}else {
+			throw new AuthenticationErrorException("Failed to authenticate");
 		}
-		
-		return null;
 	}
 	
     @GetMapping("/users")
