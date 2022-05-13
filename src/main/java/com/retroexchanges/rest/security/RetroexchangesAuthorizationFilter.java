@@ -1,6 +1,7 @@
 package com.retroexchanges.rest.security;
 
 import java.io.IOException;
+
 import java.util.List;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -62,6 +63,15 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 	private Claims validateToken(HttpServletRequest request) {
 		try {
 			String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
+			return Jwts.parserBuilder().setSigningKey(SECRET.getBytes()).build().parseClaimsJws(jwtToken).getBody();
+		}catch(JwtException  ex) {
+		}
+		return null;
+	}
+	
+	public Claims decodeToken(String request) {
+		try {
+			String jwtToken = request.replace(PREFIX, "");
 			return Jwts.parserBuilder().setSigningKey(SECRET.getBytes()).build().parseClaimsJws(jwtToken).getBody();
 		}catch(JwtException  ex) {
 		}

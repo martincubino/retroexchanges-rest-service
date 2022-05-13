@@ -19,6 +19,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler
 	private String INCORRECT_REQUEST = "INCORRECT_REQUEST";
 	private String UNAUTHORIZED= "UNAUTHORIZED"; 
 	private String BAD_REQUEST = "BAD_REQUEST";
+	private String FORBIDDEN = "FORBIDDEN";  
+	
+	
+	@ExceptionHandler(ForbidenResourceException.class)
+	public final ResponseEntity<ErrorResponse> handleForbidenErrorException
+						(ForbidenResourceException ex, WebRequest request) 
+	{
+		List<String> details = new ArrayList<>();
+		details.add(ex.getLocalizedMessage());
+		ErrorResponse error = new ErrorResponse(FORBIDDEN, details);
+		return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+	}
 	
 	@ExceptionHandler(AuthenticationErrorException.class)
 	public final ResponseEntity<ErrorResponse> handleAuthenticationErrorException
@@ -29,6 +41,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler
 		ErrorResponse error = new ErrorResponse(UNAUTHORIZED, details);
 		return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
 	}
+	
 	@ExceptionHandler(RecordAlreadyExistException.class)
 	public final ResponseEntity<ErrorResponse> handleUserAlreadyExistException
 						(RecordAlreadyExistException ex, WebRequest request) 
