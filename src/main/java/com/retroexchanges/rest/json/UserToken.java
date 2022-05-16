@@ -28,6 +28,8 @@ public class UserToken implements Serializable{
     private Date createAt;
     
     private Date expirateAt;
+    
+    private boolean isAdmin;
 
     public String getToken() {
 		return token;
@@ -59,6 +61,14 @@ public class UserToken implements Serializable{
 	
 	public Date getExpirateAt() {
 		return this.expirateAt;
+	}
+	
+	public void setIsAdmin(boolean isAdmin) {
+		this.isAdmin=isAdmin;;
+	}
+	
+	public boolean getIsAdmin() {
+		return this.isAdmin;
 	}
 
 }

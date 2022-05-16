@@ -54,7 +54,7 @@ public class UserController {
 			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
 
 			UserToken userToken = authorization.getJWTToken(user.getEmail(), user.getIsAdmin());
-
+			userToken.setIsAdmin(user.getIsAdmin());
 			return userToken;
 
 		} else {
@@ -122,21 +122,36 @@ public class UserController {
 	
 
 	@PutMapping("/user/{email}")
-	public User updateUser(@PathVariable(value = "email") String email, @Valid @RequestBody User userDetails) {
+	public User updateUser(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email, @Valid @RequestBody User userDetails) {
 
-		User user = userRepository.findById(email)
-				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", email)));
+		boolean administrator = false;
+		RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+    	Claims claims = authorization.decodeToken(header);
+    	String tokenUser = claims.getSubject();
+    	List<String> roles = claims.get("authorities",List.class);
+    	if (roles.indexOf("ROLE_ADMIN")!=-1) {
+    		administrator = true;
+    	}
+    	if (tokenUser.equals(email)||(administrator==true)) {
 
-		user.setName(userDetails.getName());
-		user.setSurname(userDetails.getSurname());
-		user.setEmail(userDetails.getEmail());
-		user.setAddress(userDetails.getAddress());
-		user.setPassword(userDetails.getPassword());
-		user.setNif(userDetails.getNif());
-		user.setStatus(userDetails.getStatus());
+    		User user = userRepository.findById(email)
+    				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", email)));
 
-		User updatedUser = userRepository.save(user);
-		return updatedUser;
+    		user.setName(userDetails.getName());
+    		user.setSurname(userDetails.getSurname());
+    		user.setEmail(userDetails.getEmail());
+    		user.setAddress(userDetails.getAddress());
+    		user.setPassword(userDetails.getPassword());
+    		user.setNif(userDetails.getNif());
+    		User updatedUser = userRepository.save(user);
+    		
+			return updatedUser;
+
+    	}else {
+    		throw new ForbidenResourceException("Forbidden operation");
+    	}
+    	
+
 	}
 
 	@DeleteMapping("/user/{id}")
