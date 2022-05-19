@@ -54,7 +54,7 @@ public class UserController {
 			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
 
 			UserToken userToken = authorization.getJWTToken(user.getEmail(), user.getIsAdmin());
-			userToken.setIsAdmin(user.getIsAdmin());
+ 			userToken.setIsAdmin(user.getIsAdmin());
 			return userToken;
 
 		} else {

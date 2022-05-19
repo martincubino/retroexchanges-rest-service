@@ -72,6 +72,22 @@ public class Category {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
+    
+    public Date getCreateAt(){
+    	return createAt;
+    }
+    
+    public void setCreateAt(Date createAt){
+    	this.createAt = createAt;
+    }
+    
+    public Date getUpdatedAt(){
+    	return updatedAt;
+    }
+    
+    public void setUpdatedAt(Date updatedAt){
+    	this.updatedAt= updatedAt;
+    }
 
     
 }

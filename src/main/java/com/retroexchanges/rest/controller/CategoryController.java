@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8081/#/", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:8081/#/", maxAge = 36000)
 public class CategoryController {
 
     @Autowired
@@ -34,6 +34,7 @@ public class CategoryController {
         return categoryRepository.findAll();
     }
 
+    @CrossOrigin(origins = "*")
     @PostMapping("/category")
     public Category createCategory(@ModelAttribute CategoryDTO categoryDTO) throws IOException {
         Category c = new Category();
@@ -42,17 +43,20 @@ public class CategoryController {
         c.setImage(categoryDTO.getLogo().getBytes());
     	return categoryRepository.save(c);
     }
-
+    
+    @CrossOrigin(origins = "*")
     @GetMapping("/category/{id}")
     public Category getCategoryById(@PathVariable(value = "id") Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",categoryId)));
     }
-
+    
+    @CrossOrigin(origins = "*")
     @PutMapping("/category/{id}")
     public Category updateNote(@ModelAttribute CategoryDTO categoryDTO,@PathVariable(value = "id") Long categoryId) throws IOException  {
     	
-        Category category = categoryRepository.findById(categoryId)
+    	long id = categoryId;
+        Category category = categoryRepository.findById(id)
         		.orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",categoryId)));
 
         category.setName(categoryDTO.getName());
