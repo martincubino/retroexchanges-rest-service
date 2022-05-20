@@ -36,6 +36,7 @@ public class RetroexchangesRestApplication {
 				.antMatchers(HttpMethod.GET, "/api/product/*").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/products").permitAll()
 				.antMatchers(HttpMethod.POST, "/api/login").permitAll()
+				.antMatchers(HttpMethod.POST, "/api/product").permitAll()
 				.antMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
 				.antMatchers(HttpMethod.PUT, "/api/category").hasRole("ADMIN")
 				.antMatchers(HttpMethod.POST, "/api/category").hasRole("ADMIN")

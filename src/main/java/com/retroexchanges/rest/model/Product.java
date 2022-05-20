@@ -37,20 +37,18 @@ public class Product implements Serializable {
     @NotBlank
     private String owner;
     
-    @NotBlank
     private Double price;
     
-    @NotBlank
     private Long categoryId;
     
-    @NotBlank
+    @Enumerated(EnumType.ORDINAL)
     private ProductStatus status;
     
     @OneToMany(cascade = CascadeType.ALL, mappedBy="product")
     @OrderBy("pictureId ASC")
     private List<ProductPicture> productPictures;
 	
-	public List<ProductPicture> getLabelList() {
+	public List<ProductPicture> getPictureList() {
 		return productPictures;
 	}
 
@@ -119,10 +117,7 @@ public class Product implements Serializable {
 	public void setStatus(ProductStatus status) {
 		this.status = status;
 	}
-	/*public List <ProductPicture> getProductPictures() {
-        return productPictures;
-    }*/
-
+	
 
     
 }
