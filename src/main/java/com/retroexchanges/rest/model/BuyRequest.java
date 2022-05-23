@@ -21,7 +21,10 @@ import java.io.Serializable;
 @JsonIgnoreProperties(value = {"createAt", "updatedAt"},
 allowGetters = true)
 public class BuyRequest implements Serializable{
-    @Id
+    
+	private static final long serialVersionUID = -2765263333343436707L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long requestId;
 
@@ -32,13 +35,10 @@ public class BuyRequest implements Serializable{
     private String seller;
     
     @NotBlank
-    private Long produtId;
+    private Long productId;
     
     @NotBlank
     private Double price;
-    
-    @NotBlank
-    private Long categoryId;
     
     @NotBlank
     private RequestStatus status;
@@ -82,12 +82,12 @@ public class BuyRequest implements Serializable{
 		this.seller = seller;
 	}
 
-	public Long getProdutId() {
-		return produtId;
+	public Long getProductId() {
+		return productId;
 	}
 
 	public void setProdutId(Long produtId) {
-		this.produtId = produtId;
+		this.productId = produtId;
 	}
 
 	public void setId(Long requestId) {

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
+import java.util.*;
 import java.io.Serializable;
 
 
@@ -35,22 +35,17 @@ public class User implements Serializable{
 	@NotBlank
     private String surname;
     
-    
-	@NotBlank
     private String address;
     
     @NotBlank
     private String password;
     
-    @NotBlank
     private String nif;
     
-    @NotBlank
     @Enumerated(EnumType.ORDINAL)
     private UserStatus status;
     
-    @NotBlank
-    private Boolean isAdmin;
+    private boolean isAdmin = false;
     
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -61,7 +56,7 @@ public class User implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
-
+    
     public String getName() {
         return name;
     }
@@ -117,5 +112,14 @@ public class User implements Serializable{
 	public void setStatus(UserStatus status) {
 		this.status = status;
 	}
+	
+	public void setIsAdmin(boolean isadmin) {
+		this.isAdmin= isadmin;
+	}
+	
+	public boolean getIsAdmin() {
+		return this.isAdmin;
+	}
+	
 
 }

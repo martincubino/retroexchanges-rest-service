@@ -1,12 +1,8 @@
 package com.retroexchanges.rest.model;
 
-import com.retroexchanges.rest.enumeration.*;
-
-import com.retroexchanges.rest.model.RatingPK;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;

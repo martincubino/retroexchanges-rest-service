@@ -37,22 +37,25 @@ public class Product implements Serializable {
     @NotBlank
     private String owner;
     
-    @NotBlank
     private Double price;
     
-    @NotBlank
-    private Long categoryId;
+    @OneToOne()
+    @JoinColumn(name="category_id")
+    private Category category;
     
-    @NotBlank
+    @Enumerated(EnumType.ORDINAL)
     private ProductStatus status;
     
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="product")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="productId")
     @OrderBy("pictureId ASC")
     private List<ProductPicture> productPictures;
-
 	
-	public List<ProductPicture> getLabelList() {
+	public List<ProductPicture> getPictureList() {
 		return productPictures;
+	}
+
+	public void setPictureList(List<ProductPicture> productPictures) {
+		this.productPictures = productPictures;
 	}
 
     public Long getProductId() {
@@ -105,25 +108,27 @@ public class Product implements Serializable {
 		this.price = price;
 	}
 
-	public Long getCategoryId() {
-		return categoryId;
+	public Category getCategory() {
+		return category;
 	}
 
-	public void setCategoryId(Long categoryId) {
-		this.categoryId = categoryId;
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 	
 	public ProductStatus getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public void setStatus(ProductStatus status) {
 		this.status = status;
 	}
-	/*public List <ProductPicture> getProductPictures() {
-        return productPictures;
-    }*/
-
+	public Date getCreateAt() {
+		return this.createAt;
+	}
+	public Date getUpdatedAt() {
+		return this.updatedAt;
+	}
 
     
 }
