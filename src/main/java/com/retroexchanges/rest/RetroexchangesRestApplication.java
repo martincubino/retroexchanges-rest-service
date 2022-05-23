@@ -1,5 +1,6 @@
 package com.retroexchanges.rest;
 
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -31,10 +32,17 @@ public class RetroexchangesRestApplication {
 					.authorizeRequests()
 					.antMatchers(HttpMethod.POST, "/api/product").hasRole("USER")
 					.antMatchers(HttpMethod.POST, "/api/favorite").hasRole("USER")
+					.antMatchers(HttpMethod.POST, "/api/request").hasRole("USER")
 					.antMatchers(HttpMethod.DELETE, "/api/favorite").hasRole("USER")
+					.antMatchers(HttpMethod.DELETE, "/api/request").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/favorite").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/api/requests/*").hasRole("USER")					
+					.antMatchers(HttpMethod.GET, "/api/request").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/favorite/*").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/favorites").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/api/rating").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/api/rating/*").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/api/ratings/*").hasRole("USER")
 					.antMatchers(HttpMethod.PUT, "/api/product").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
 					.antMatchers(HttpMethod.PUT, "/api/category").hasRole("ADMIN")

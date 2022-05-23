@@ -1,12 +1,7 @@
 package com.retroexchanges.rest.controller;
 
-import com.retroexchanges.rest.enumeration.UserStatus;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
-import com.retroexchanges.rest.exception.RecordAlreadyExistException;
 import com.retroexchanges.rest.exception.AuthenticationErrorException;
-import com.retroexchanges.rest.exception.ForbidenResourceException;
-import com.retroexchanges.rest.json.Login;
-import com.retroexchanges.rest.json.UserToken;
 import com.retroexchanges.rest.model.Product;
 import com.retroexchanges.rest.model.Favorite;
 import com.retroexchanges.rest.model.FavoritePK;
@@ -17,16 +12,12 @@ import com.retroexchanges.rest.repository.UserRepository;
 import com.retroexchanges.rest.security.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import javax.validation.Valid;
 import io.jsonwebtoken.Claims;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -110,7 +101,7 @@ public class FavoriteController {
 
 		FavoritePK favPK = new FavoritePK(email,productId);
 		
-		return favoriteRepository.findById(favPK).orElseThrow(() -> new RecordNotFoundException(String.format("Favorite %s-%d not found", email,productId)));
+		return favoriteRepository.findById(favPK).orElseThrow(() -> new RecordNotFoundException(String.format("Favorite %s-%d not found", user.getEmail(),product.getProductId())));
 
 	}
 	
