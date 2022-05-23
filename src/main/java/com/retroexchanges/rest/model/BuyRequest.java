@@ -24,23 +24,33 @@ public class BuyRequest implements Serializable{
     
 	private static final long serialVersionUID = -2765263333343436707L;
 
+	public BuyRequest() {
+		
+	}
+	public BuyRequest(User buyer, User seller, Product product){
+		this.buyer = buyer;
+		this.seller = seller;
+		this.product = product;
+	}
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long requestId;
 
-    @NotBlank
-    private String buyer;
+	@OneToOne()
+    @JoinColumn(name="buyer")
+    private User buyer;
 
-	@NotBlank
-    private String seller;
+	@OneToOne()
+    @JoinColumn(name="seller")
+    private User seller;
     
-    @NotBlank
-    private Long productId;
-    
-    @NotBlank
+	@OneToOne()
+    @JoinColumn(name="productId")
+    private Product product;
+	
     private Double price;
     
-    @NotBlank
     private RequestStatus status;
     
     @Column(nullable = false, updatable = false)
@@ -66,28 +76,28 @@ public class BuyRequest implements Serializable{
 		this.requestId = requestId;
 	}
 
-	public String getBuyer() {
-		return buyer;
+	public User getBuyer() {
+		return this.buyer;
 	}
 
-	public void setBuyer(String buyer) {
+	public void setBuyer(User buyer) {
 		this.buyer = buyer;
 	}
 
-	public String getSeller() {
-		return seller;
+	public User getSeller() {
+		return this.seller;
 	}
 
-	public void setSeller(String seller) {
+	public void setSeller(User seller) {
 		this.seller = seller;
 	}
 
-	public Long getProductId() {
-		return productId;
+	public Product getProduct() {
+		return this.product;
 	}
 
-	public void setProdutId(Long produtId) {
-		this.productId = produtId;
+	public void setProduct(Product product) {
+		this.product = product;
 	}
 
 	public void setId(Long requestId) {
@@ -110,7 +120,11 @@ public class BuyRequest implements Serializable{
 	public void setStatus(RequestStatus status) {
 		this.status = status;
 	}
-
-
+	public Date getCreateAt() {
+		return this.createAt;
+	}
+	public Date getUpdatedAt() {
+		return this.updatedAt;
+	}
     
 }
