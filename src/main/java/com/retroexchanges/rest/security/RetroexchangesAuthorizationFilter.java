@@ -100,12 +100,13 @@ public class RetroexchangesAuthorizationFilter extends OncePerRequestFilter {
 		return true;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public UserToken getJWTToken(String username, boolean isAdmin) {
 				
 		List<GrantedAuthority> grantedAuthorities= AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
 		
 		if (isAdmin == true) {
-			grantedAuthorities= AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_ADMIN");
+			grantedAuthorities= AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER, ROLE_ADMIN");
 		}
 		
 		Date createAt = new Date(System.currentTimeMillis());

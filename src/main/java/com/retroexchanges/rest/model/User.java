@@ -2,7 +2,6 @@ package com.retroexchanges.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.retroexchanges.rest.enumeration.*;
-import com.retroexchanges.rest.json.UserToken;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -58,8 +57,7 @@ public class User implements Serializable{
     @LastModifiedDate
     private Date updatedAt;
     
-    	
-	public String getName() {
+    public String getName() {
         return name;
     }
 

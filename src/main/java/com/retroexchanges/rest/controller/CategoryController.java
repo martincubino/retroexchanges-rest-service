@@ -3,21 +3,14 @@ package com.retroexchanges.rest.controller;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.repository.CategoryRepository;
-import com.retroexchanges.rest.exception.RecordNotFoundException;
-import com.retroexchanges.rest.json.CategoryDTO;
-import org.springframework.http.HttpStatus;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-import javax.validation.Valid;
-
 import java.io.IOException;
 import java.util.List;
-
+import javax.validation.Valid;
 
 
 @RestController
@@ -36,11 +29,11 @@ public class CategoryController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/category")
-    public Category createCategory(@ModelAttribute CategoryDTO categoryDTO) throws IOException {
+    public Category createCategory(@Valid @RequestBody Category category) throws IOException {
         Category c = new Category();
-        c.setName(categoryDTO.getName());
-        c.setDescription(categoryDTO.getDescription());
-        c.setImage(categoryDTO.getLogo().getBytes());
+        c.setName(category.getName());
+        c.setDescription(category.getDescription());
+        c.setImage(category.getImage());
     	return categoryRepository.save(c);
     }
     
@@ -53,17 +46,17 @@ public class CategoryController {
     
     @CrossOrigin(origins = "*")
     @PutMapping("/category/{id}")
-    public Category updateNote(@ModelAttribute CategoryDTO categoryDTO,@PathVariable(value = "id") Long categoryId) throws IOException  {
+    public Category updateCategory(@Valid @RequestBody Category category,@PathVariable(value = "id") Long categoryId) throws IOException  {
     	
     	long id = categoryId;
-        Category category = categoryRepository.findById(id)
+        Category c = categoryRepository.findById(id)
         		.orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",categoryId)));
 
-        category.setName(categoryDTO.getName());
-        category.setDescription(categoryDTO.getDescription());
-        category.setImage(categoryDTO.getLogo().getBytes());
+        c.setName(category.getName());
+        c.setDescription(category.getDescription());
+        c.setImage(category.getImage());
 
-        Category updatedCategory = categoryRepository.save(category);
+        Category updatedCategory = categoryRepository.save(c);
         return updatedCategory;
     }
 

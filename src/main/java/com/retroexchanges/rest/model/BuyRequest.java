@@ -21,7 +21,10 @@ import java.io.Serializable;
 @JsonIgnoreProperties(value = {"createAt", "updatedAt"},
 allowGetters = true)
 public class BuyRequest implements Serializable{
-    @Id
+    
+	private static final long serialVersionUID = -2765263333343436707L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long requestId;
 

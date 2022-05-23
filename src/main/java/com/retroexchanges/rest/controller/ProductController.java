@@ -1,28 +1,24 @@
 package com.retroexchanges.rest.controller;
 
-import com.retroexchanges.rest.enumeration.ProductStatus;
+import com.retroexchanges.rest.exception.ForbidenResourceException;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
-import com.retroexchanges.rest.json.CategoryDTO;
-import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.model.Product;
+import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.repository.ProductRepository;
+import com.retroexchanges.rest.repository.CategoryRepository;
+import com.retroexchanges.rest.security.RetroexchangesAuthorizationFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.retroexchanges.rest.json.ProductDTO;
+import io.jsonwebtoken.Claims;
 
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import com.retroexchanges.rest.model.ProductPicture;
+
 import javax.validation.Valid;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,24 +29,85 @@ public class ProductController {
     @Autowired
     ProductRepository productRepository;
     
+    @Autowired
+    CategoryRepository categoryRepository;
+    
     @CrossOrigin(origins = "*")
     @GetMapping("/products")
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        return productRepository.findAllOrderByUpdatedAtDesc();
+    }
+    
+    @CrossOrigin(origins = "*")
+    @GetMapping("/products/{type}/{value}")
+    public List<Product> getAllUserProducts(@PathVariable(value = "type") String type,@PathVariable(value = "value") String value) throws IOException  {
+        switch(type) {
+        	case "user":
+        		List<Product> lpu = productRepository.findAllByOwner(value);
+        		if (lpu.size() == 0) {
+        				throw new RecordNotFoundException(String.format("Product not found with owner %s",value));
+        		}
+        		else { 
+        			return lpu;
+        		}
+        	case "category":
+        		Category category = categoryRepository.findById(Long.parseLong(value)).orElseThrow(() -> new RecordNotFoundException(String.format("Category %d not found",Long.parseLong(value))));
+        		
+        		List<Product> lpc =productRepository.findAllByCategory(category);
+        		if (lpc.size() == 0) {
+        			throw new RecordNotFoundException(String.format("Product not found with category %d",Integer.parseInt(value)));
+        		}else {
+        			return lpc;
+        		}
+        	case "name":
+        		List<Product> lpn  = productRepository.findByNameContainingIgnoreCase(value);
+        		if (lpn.size() == 0) {
+        			throw new RecordNotFoundException(String.format("Product not found with name %s",value));
+        		}else {
+        			return lpn;
+        		}
+        }
+        throw new RecordNotFoundException(String.format("Product not found"));
     }
     
     @CrossOrigin(origins = "*")
     @PostMapping("/product")
-    public Product createProduct( @Valid @RequestBody ProductDTO productDTO) throws IOException {
-        Product p = new Product();
-        p.setName(productDTO.getName());
-        p.setDescription(productDTO.getDescription());
-        p.setStatus(productDTO.getStatus());
-        p.setOwner(productDTO.getOwner());
-        long i = productDTO.getCategoryId();
-        p.setCategoryId(i);
-        p.setPrice(productDTO.getPrice());
+    public Product createProduct(@RequestHeader("authorization") String header, @Valid @RequestBody Product product) throws IOException {
+    	// Solo dejamos dar de alta productos asociados al usuario autenticado
+    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+    	Claims claims = authorization.decodeToken(header);
+    	String tokenUser = claims.getSubject();
+    	
+    	if (tokenUser.equals(product.getOwner())) {
+    	//Creamos un nuevo producto
+    	Product p = new Product();
+        //Asignamos los valores que nos pasan en el json
+    	p.setName(product.getName());
+        p.setDescription(product.getDescription());
+        p.setStatus(product.getStatus());
+        p.setOwner(product.getOwner());
+        p.setCategory(product.getCategory());
+        p.setPrice(product.getPrice());
+
+        //Damos de alta el producto
+        Product newProduct = productRepository.save(p);
+        // Recuperamos el identificador del producto
+        Long productId = newProduct.getProductId();
+        p = productRepository.findById(productId)
+			.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
+        
+        // Y guardamos las imagenes asociandolas al producto ya dado de alta
+        List<ProductPicture> pictureList = product.getPictureList();
+        for(int index=0;index<pictureList.size();index++) {
+        	ProductPicture productPicture = pictureList.get(index);
+        	productPicture.setProductId(productId);
+        }
+        // Guardamos el producto con sus imagenes y lo retornamos al cliente
+        p.setPictureList(pictureList); 
         return productRepository.save(p);
+    	}else {
+    		throw new ForbidenResourceException("Forbidden operation");
+    	}
     }
     
     @CrossOrigin(origins = "*")
@@ -60,32 +117,52 @@ public class ProductController {
         		.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
         
     }
-
+    
+    @CrossOrigin(origins = "*")
     @PutMapping("/product/{id}")
-    public Product updateProduct(@PathVariable(value = "id") Long productId,
+    public Product updateProduct(@RequestHeader("authorization") String header, @PathVariable(value = "id") Long productId,
                                            @Valid @RequestBody Product productDetails) {
 
         Product product = productRepository.findById(productId)
         		.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
 
-        product.setName(productDetails.getName());
-        product.setDescription(productDetails.getDescription());
-        product.setOwner(productDetails.getOwner());
-        product.setPrice(productDetails.getPrice());
-        product.setCategoryId(productDetails.getCategoryId());
-        product.setStatus(productDetails.getStatus());
-        
-        Product updatedProduct = productRepository.save(product);
-        return updatedProduct;
+        // Solo dejamos actualizar productos asociados al usuario autenticado
+    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+    	Claims claims = authorization.decodeToken(header);
+    	String tokenUser = claims.getSubject();
+    	
+    	if (tokenUser.equals(product.getOwner())) {
+	        product.setName(productDetails.getName());
+	        product.setDescription(productDetails.getDescription());
+	        product.setOwner(productDetails.getOwner());
+	        product.setPrice(productDetails.getPrice());
+	        product.setPictureList(productDetails.getPictureList());
+	        product.setCategory(productDetails.getCategory());
+	        product.setStatus(productDetails.getStatus());
+	        
+	        Product updatedProduct = productRepository.save(product);
+	        return updatedProduct;
+    	}else {
+    		throw new ForbidenResourceException("Forbidden operation");
+    	}
     }
 
     @DeleteMapping("/product/{id}")
-    public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long productId) {
+    public ResponseEntity<?> deleteNote(@RequestHeader("authorization") String header, @PathVariable(value = "id") Long productId) {
         Product product = productRepository.findById(productId)
         		.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
 
-        productRepository.delete(product);
-
-        return ResponseEntity.ok().build();
+     // Solo dejamos actualizar productos asociados al usuario autenticado
+    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+    	Claims claims = authorization.decodeToken(header);
+    	String tokenUser = claims.getSubject();
+    	
+    	if (tokenUser.equals(product.getOwner())) {
+    		productRepository.delete(product);
+    		return ResponseEntity.ok().build();
+    	}else {
+    		throw new ForbidenResourceException("Forbidden operation");
+    	}
+        
     }
 }

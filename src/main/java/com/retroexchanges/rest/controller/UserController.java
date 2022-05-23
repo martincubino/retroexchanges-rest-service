@@ -9,26 +9,17 @@ import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.json.UserToken;
 import com.retroexchanges.rest.model.User;
 import com.retroexchanges.rest.repository.UserRepository;
-import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.security.*;
-import org.springframework.http.HttpStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
 import javax.validation.Valid;
 import io.jsonwebtoken.Claims;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.Optional;
 
 @RestController
@@ -46,7 +37,6 @@ public class UserController {
 		User user = userRepository.findById(username)
 				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", username)));
 
-		String email = user.getEmail();
 		String password = user.getPassword();
 		String login_password = login.getPassword();
 
