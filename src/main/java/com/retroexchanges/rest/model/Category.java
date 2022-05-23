@@ -20,7 +20,7 @@ allowGetters = true)
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long categoryId;
 
     @NotBlank
     private String name;
@@ -28,15 +28,15 @@ public class Category {
     private String description;
 
     @Lob
-    private Byte[] image;
+    private byte[] image;
 
 
-    public Long getId() {
-        return id;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCategoryId(Long id) {
+        this.categoryId = id;
     }
 
     public String getName() {
@@ -55,11 +55,11 @@ public class Category {
         this.description = description;
     }
     
-    public Byte[] getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(Byte[] image) {
+    public void setImage(byte[] image) {
         this.image = image;
     }
     
@@ -72,6 +72,22 @@ public class Category {
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
+    
+    public Date getCreateAt(){
+    	return createAt;
+    }
+    
+    public void setCreateAt(Date createAt){
+    	this.createAt = createAt;
+    }
+    
+    public Date getUpdatedAt(){
+    	return updatedAt;
+    }
+    
+    public void setUpdatedAt(Date updatedAt){
+    	this.updatedAt= updatedAt;
+    }
 
     
 }
