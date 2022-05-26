@@ -73,12 +73,6 @@ public class Rating implements Serializable {
 	public void setUserWhoRate(User userWhoRate) {
 		this.userWhoRate = userWhoRate;
 	}
-	public BuyRequest getBuyRequest() {
-		return buyRequest;
-	}
-	public void setBuyRequest(BuyRequest buyRequest) {
-		this.buyRequest = buyRequest;
-	}
 	public Double getRating() {
 		return rating;
 	}

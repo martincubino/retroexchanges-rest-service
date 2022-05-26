@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8081/#/", maxAge = 36000)
+@CrossOrigin(origins = "*")
 public class CategoryController {
 
     @Autowired

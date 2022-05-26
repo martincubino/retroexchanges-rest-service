@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.List;
 import java.io.Serializable;
 
 /**
@@ -48,6 +49,11 @@ public class BuyRequest implements Serializable{
 	@OneToOne()
     @JoinColumn(name="productId")
     private Product product;
+	
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="buyRequest")
+    private List<Rating> requestRating;
+	
 	
     private Double price;
     
@@ -111,7 +117,6 @@ public class BuyRequest implements Serializable{
 	public void setPrice(Double price) {
 		this.price = price;
 	}
-
 	
 	public RequestStatus getStatus() {
 		return status;
@@ -125,6 +130,13 @@ public class BuyRequest implements Serializable{
 	}
 	public Date getUpdatedAt() {
 		return this.updatedAt;
+	}
+	
+	public List<Rating> getRatings(){
+		return this.requestRating;
+	}
+	public void setRatings(List<Rating> ratings){
+		this.requestRating = ratings;
 	}
     
 }
