@@ -2,15 +2,15 @@ package com.retroexchanges.rest.json;
 
 import java.io.Serializable;
 
+public class RatingRequest implements Serializable {
 
-public class RatingRequest implements Serializable{
-	
 	private static final long serialVersionUID = 7307081130724186514L;
-	
+
 	public RatingRequest() {
-		
+
 	}
-	public RatingRequest(String userRated,String userWhoRate, Long requestId) {
+
+	public RatingRequest(String userRated, String userWhoRate, Long requestId) {
 		this.userRated = userRated;
 		this.userWhoRate = userWhoRate;
 		this.buyRequestId = requestId;
@@ -39,7 +39,7 @@ public class RatingRequest implements Serializable{
 	public void setBuyRequestId(Long buyRequestId) {
 		this.buyRequestId = buyRequestId;
 	}
-	
+
 	public Double getRating() {
 		return this.rating;
 	}
@@ -49,9 +49,8 @@ public class RatingRequest implements Serializable{
 	}
 
 	private String userRated;
-    private String userWhoRate;
-    private Long buyRequestId;
-    private Double rating; 
-    
-		
+	private String userWhoRate;
+	private Long buyRequestId;
+	private Double rating;
+
 }

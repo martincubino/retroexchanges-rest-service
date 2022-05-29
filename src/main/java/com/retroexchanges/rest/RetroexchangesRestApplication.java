@@ -38,6 +38,8 @@ public class RetroexchangesRestApplication {
 					.antMatchers(HttpMethod.GET, "/api/favorite").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/requests/seller").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/requests/buyer").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/api/ratings/received").hasRole("USER")
+					.antMatchers(HttpMethod.GET, "/api/ratings/sent").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/request").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/favorite/*").hasRole("USER")
 					.antMatchers(HttpMethod.GET, "/api/favorites").hasRole("USER")

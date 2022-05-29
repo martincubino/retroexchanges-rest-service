@@ -6,6 +6,7 @@ import com.retroexchanges.rest.exception.RecordAlreadyExistException;
 import com.retroexchanges.rest.exception.AuthenticationErrorException;
 import com.retroexchanges.rest.exception.ForbidenResourceException;
 import com.retroexchanges.rest.json.Login;
+import com.retroexchanges.rest.json.UserSecure;
 import com.retroexchanges.rest.json.UserToken;
 import com.retroexchanges.rest.model.User;
 import com.retroexchanges.rest.repository.UserRepository;
@@ -92,7 +93,7 @@ public class UserController {
 	}
 
 	@GetMapping("/user/{email}")
-    public User getUserById(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email) {
+    public UserSecure getUserById(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email) {
 		
 		boolean administrator = false;
 		RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
@@ -103,8 +104,10 @@ public class UserController {
     		administrator = true;
     	}
     	if (tokenUser.equals(email)||(administrator==true)) {
-    		return userRepository.findById(email).orElseThrow(() -> 
+    		User user = userRepository.findById(email).orElseThrow(() -> 
     		new RecordNotFoundException(String.format("User %s not found",email)));
+    		UserSecure us = new UserSecure(user);
+    		return us;
     	}else {
     		throw new ForbidenResourceException("Forbidden operation");
     	}
@@ -112,7 +115,7 @@ public class UserController {
 	
 
 	@PutMapping("/user/{email}")
-	public User updateUser(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email, @Valid @RequestBody User userDetails) {
+	public UserSecure updateUser(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email, @Valid @RequestBody User userDetails) {
 
 		boolean administrator = false;
 		RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
@@ -131,11 +134,15 @@ public class UserController {
     		user.setSurname(userDetails.getSurname());
     		user.setEmail(userDetails.getEmail());
     		user.setAddress(userDetails.getAddress());
-    		user.setPassword(userDetails.getPassword());
+    		if (!userDetails.getPassword().isEmpty()) {
+    			user.setPassword(userDetails.getPassword());
+    		}
     		user.setNif(userDetails.getNif());
+    		UserStatus userStatus =userDetails.getStatus(); 
+    		user.setStatus(userStatus );
     		User updatedUser = userRepository.save(user);
-    		
-			return updatedUser;
+    		UserSecure us = new UserSecure(updatedUser);
+			return us;
 
     	}else {
     		throw new ForbidenResourceException("Forbidden operation");

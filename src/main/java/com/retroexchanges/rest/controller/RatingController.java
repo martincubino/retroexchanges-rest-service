@@ -6,6 +6,7 @@ import com.retroexchanges.rest.model.Rating;
 import com.retroexchanges.rest.model.BuyRequest;
 import com.retroexchanges.rest.model.User;
 import com.retroexchanges.rest.json.UserRating;
+import com.retroexchanges.rest.json.RatingSecure;
 import com.retroexchanges.rest.json.RatingRequest;
 import com.retroexchanges.rest.repository.RatingRepository;
 
@@ -20,6 +21,7 @@ import io.jsonwebtoken.Claims;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api")
@@ -47,15 +49,25 @@ public class RatingController {
     	String emailUserRated = rating.getUserRated();
     	Long requestId = rating.getBuyRequestId();
     	
-		if (tokenUser.equals(email)) 
+    	boolean grantUser = false;
+    	if (tokenUser.equals(email)) {
+    		grantUser =true;
+    	}
+    	if (tokenUser.equals(emailUserRated)) {
+    		grantUser =true;
+    	}
+    	
+		if (grantUser) 
     	{
-    		User user = userRepository.findById(email)
+    		User userWhoRate = userRepository.findById(email)
     				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", email)));
+    		User userRated = userRepository.findById(emailUserRated)
+    				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", emailUserRated)));
 		
     		BuyRequest buyRequest = buyRequestRepository.findById(requestId )
     				.orElseThrow(() -> new RecordNotFoundException(String.format("Request %d not found", requestId)));
 
-    		Rating rat= new Rating(emailUserRated,email,requestId );
+    		Rating rat= new Rating(userWhoRate,userRated,buyRequest);
     		rat.setRating(rating.getRating());
     		
     		return ratingRepository.save(rat);
@@ -86,8 +98,8 @@ public class RatingController {
 	}
 	
 	@CrossOrigin(origins = "*")
-	@GetMapping("/ratings/{email}")
-	public List<Rating> getRatings(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email){
+	@GetMapping("/ratings/received/{email}")
+	public List<RatingSecure> getRatingsReceived(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email){
     	// Solo dejamos dar de alta productos asociados al usuario autenticado
     	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
     	Claims claims = authorization.decodeToken(header);
@@ -98,9 +110,46 @@ public class RatingController {
     		User user = userRepository.findById(email)
 				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", email)));
     		
+    		List<RatingSecure> ratingSecure = new ArrayList<RatingSecure>(); 
     		List<Rating> rating = ratingRepository.findAllByUserRated(user);
+    		for(int i=0;i<rating.size();i++) 
+    		{
+    			Rating r = rating.get(i);
+    			RatingSecure rs = new RatingSecure(r);
+    			ratingSecure.add(rs);
+    		}
 
-    		return rating; 
+    		return ratingSecure; 
+		
+    	}else {
+			throw new AuthenticationErrorException("Failed to authenticate");
+    	}
+	}
+	
+	@CrossOrigin(origins = "*")
+	@GetMapping("/ratings/sent/{email}")
+	public List<RatingSecure> getRatingsSent(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email){
+    	// Solo dejamos dar de alta productos asociados al usuario autenticado
+    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+    	Claims claims = authorization.decodeToken(header);
+    	String tokenUser = claims.getSubject();
+    	
+    	if (tokenUser.equals(email)) 
+    	{
+    		User user = userRepository.findById(email)
+				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", email)));
+    		
+    		List<RatingSecure> ratingSecure = new ArrayList<RatingSecure>(); 
+    		List<Rating> rating = ratingRepository.findAllByUserWhoRate(user);
+    		for(int i=0;i<rating.size();i++) 
+    		{
+    			Rating r = rating.get(i);
+    			RatingSecure rs = new RatingSecure(r);
+    			ratingSecure.add(rs);
+    		}
+
+    		return ratingSecure; 
+ 
 		
     	}else {
 			throw new AuthenticationErrorException("Failed to authenticate");
