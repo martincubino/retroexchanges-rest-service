@@ -3,6 +3,7 @@ package com.retroexchanges.rest.controller;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.enumeration.RequestStatus;
 import com.retroexchanges.rest.exception.AuthenticationErrorException;
+import com.retroexchanges.rest.exception.ForbidenResourceException;
 import com.retroexchanges.rest.model.Product;
 import com.retroexchanges.rest.model.BuyRequest;
 import com.retroexchanges.rest.model.User;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:8081", maxAge = 36000)
+@CrossOrigin(origins = "*")
 public class BuyRequestController {
 
 	@Autowired
@@ -68,7 +69,7 @@ public class BuyRequestController {
 	}
 	
 	@CrossOrigin(origins = "*")
-	@GetMapping("/request/buyer/{email}")
+	@GetMapping("/requests/buyer/{email}")
 	public List<BuyRequest> getRequestBuyer(@RequestHeader("authorization") String header, @PathVariable(value = "email") String email){
     	// Solo dejamos dar de alta productos asociados al usuario autenticado
     	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
@@ -146,10 +147,14 @@ public class BuyRequestController {
 	
     	BuyRequest br = buyRequestRepository.findById(requestId).orElseThrow(() -> new RecordNotFoundException(String.format("Request %d not found", requestId)));
 		boolean grantUser = false;
-    	if (br.getBuyer().equals(tokenUser)) {
+		String buyer = br.getBuyer().getEmail();
+		String seller = br.getSeller().getEmail();
+    	if (tokenUser.equals(buyer))
+    	{
     		grantUser=true;
     	}
-    	if (br.getSeller().equals(tokenUser)) {
+    	if (tokenUser.equals(seller))
+		{
     		grantUser=true;
     	}
     	if (grantUser==false) {
@@ -207,7 +212,14 @@ public class BuyRequestController {
 		Long productId = request.getProductId();
 		Long requestId = request.getRequestId();
     	
-		if (tokenUser.equals(sellerEmail )) 
+		boolean grantUser = false;
+		if (tokenUser.equals(sellerEmail)) {
+			grantUser = true;
+		}
+		if (tokenUser.equals(buyerEmail)) {
+			grantUser = true;
+		}
+		if (grantUser) 
     	{
     			User buyer = userRepository.findById(buyerEmail)
     				.orElseThrow(() -> new RecordNotFoundException(String.format("Buyer %s not found", buyerEmail)));
@@ -220,18 +232,19 @@ public class BuyRequestController {
     			BuyRequest buyRequest = buyRequestRepository.findById(requestId)
     					.orElseThrow(() -> new RecordNotFoundException(String.format("Request %d not found", requestId)));
     			
-    			buyRequest.setPrice(request.getPrice());
-    			buyRequest.setStatus(request.getStatus());
-    			
+    			if ((buyRequest.getStatus()==RequestStatus.DENIED)|| 
+    				(buyRequest.getStatus()==RequestStatus.PENDING)){
     			buyRequestRepository.delete(buyRequest);
-    			
     			return buyRequest;
-		} 
-    	else {
-			throw new AuthenticationErrorException("Failed to authenticate");
-    	}
+   				}else{
+   					throw new ForbidenResourceException("Forbidden operation");
+   					
+   				}
+   			
+			} 
+    		else {
+				throw new AuthenticationErrorException("Failed to authenticate");
+    		}
+		}
 	}
 	
-	
-
-}

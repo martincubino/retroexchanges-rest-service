@@ -11,7 +11,7 @@ public class RatingPK implements Serializable{
 	public RatingPK() {
 		
 	}
-	public RatingPK(String userRated,String userWhoRate, Long requestId) {
+	public RatingPK(String userWhoRate, String userRated, Long requestId) {
 		this.userRated = userRated;
 		this.userWhoRate = userWhoRate;
 		this.buyRequestId = requestId;

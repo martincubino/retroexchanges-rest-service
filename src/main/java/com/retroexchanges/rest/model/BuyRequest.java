@@ -6,10 +6,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import com.retroexchanges.rest.json.UserSecure;
+import com.retroexchanges.rest.json.RatingSecure;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.Serializable;
 
 /**
@@ -49,6 +53,11 @@ public class BuyRequest implements Serializable{
     @JoinColumn(name="productId")
     private Product product;
 	
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="buyRequest")
+    private List<Rating> requestRating;
+	
+	
     private Double price;
     
     private RequestStatus status;
@@ -76,16 +85,18 @@ public class BuyRequest implements Serializable{
 		this.requestId = requestId;
 	}
 
-	public User getBuyer() {
-		return this.buyer;
+	public UserSecure getBuyer() {
+		UserSecure us = new UserSecure(this.buyer);
+		return us;
 	}
 
 	public void setBuyer(User buyer) {
 		this.buyer = buyer;
 	}
 
-	public User getSeller() {
-		return this.seller;
+	public UserSecure getSeller() {
+		UserSecure us = new UserSecure(this.seller);
+		return us;
 	}
 
 	public void setSeller(User seller) {
@@ -111,7 +122,6 @@ public class BuyRequest implements Serializable{
 	public void setPrice(Double price) {
 		this.price = price;
 	}
-
 	
 	public RequestStatus getStatus() {
 		return status;
@@ -125,6 +135,19 @@ public class BuyRequest implements Serializable{
 	}
 	public Date getUpdatedAt() {
 		return this.updatedAt;
+	}
+	
+	public List<RatingSecure> getRatings(){
+		List<RatingSecure> secureRating = new ArrayList<RatingSecure>();
+		
+		for(int i=0;i<this.requestRating.size();i++) {
+			RatingSecure rs = new RatingSecure(requestRating.get(i));
+			secureRating.add(rs);
+		}
+		return secureRating;
+	}
+	public void setRatings(List<Rating> ratings){
+		this.requestRating = ratings;
 	}
     
 }

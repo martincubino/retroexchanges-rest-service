@@ -17,5 +17,6 @@ import java.util.List;
 public interface RatingRepository extends JpaRepository<Rating, RatingPK> {
 	
 	List<Rating> findAllByUserRated(User user);
+	List<Rating> findAllByUserWhoRate(User user);
 
 }

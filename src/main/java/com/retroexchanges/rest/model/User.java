@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(value = {"createAt", "updatedAt"},
+@JsonIgnoreProperties(value = {"isAdmin","ratings","createAt", "updatedAt"},
 allowGetters = true)
 public class User implements Serializable{
 	
@@ -37,7 +37,6 @@ public class User implements Serializable{
     
     private String address;
     
-    @NotBlank
     private String password;
     
     private String nif;
@@ -56,6 +55,10 @@ public class User implements Serializable{
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
     private Date updatedAt;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="userRated")
+    @Column(insertable = false, updatable = false)
+    private List<Rating> ratings;
     
     public String getName() {
         return name;
@@ -119,6 +122,17 @@ public class User implements Serializable{
 	
 	public boolean getIsAdmin() {
 		return this.isAdmin;
+	}
+	
+	public Double getRating() {
+		Double rating = 0.0;
+		int elements = ratings.size();
+		for (int i=0;i<elements;i++) 
+		{
+			rating+=ratings.get(i).getRating();
+		}
+		rating = rating / elements; 
+		return rating ;
 	}
 	
 
