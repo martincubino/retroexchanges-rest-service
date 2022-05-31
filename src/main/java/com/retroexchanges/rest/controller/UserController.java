@@ -41,7 +41,7 @@ public class UserController {
 		String password = user.getPassword();
 		String login_password = login.getPassword();
 
-		if (password.equals(login_password)) {
+		if (password.equals(login_password)&&(user.getStatus()==UserStatus.ACTIVE)) {
 			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
 
 			UserToken userToken = authorization.getJWTToken(user.getEmail(), user.getIsAdmin());
