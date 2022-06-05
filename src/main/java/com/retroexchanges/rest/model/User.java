@@ -134,6 +134,12 @@ public class User implements Serializable{
 		rating = rating / elements; 
 		return rating ;
 	}
+	public Date getCreateAt() {
+		return this.createAt;
+	}
+	public Date getUpdatedAt() {
+		return this.updatedAt;
+	}
 	
 
 }

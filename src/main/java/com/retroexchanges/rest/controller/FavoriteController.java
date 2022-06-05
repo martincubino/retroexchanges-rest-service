@@ -2,6 +2,8 @@ package com.retroexchanges.rest.controller;
 
 import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.exception.AuthenticationErrorException;
+import com.retroexchanges.rest.exception.ForbidenResourceException;
+import com.retroexchanges.rest.exception.BadRequestException;
 import com.retroexchanges.rest.model.Product;
 import com.retroexchanges.rest.model.Favorite;
 import com.retroexchanges.rest.model.FavoritePK;
@@ -43,6 +45,13 @@ public class FavoriteController {
     	
     	String email = favorite.getEmail();
 		Long productId = favorite.getProductId();
+		
+		if (email==null) {
+			throw new BadRequestException("400 bad request");
+		}
+		if (email.isEmpty()) {
+			throw new BadRequestException("400 bad request");
+		}
     	
 		if (tokenUser.equals(email)) 
     	{
@@ -59,7 +68,7 @@ public class FavoriteController {
     		return favoriteRepository.save(fav);
 		} 
     	else {
-			throw new AuthenticationErrorException("Failed to authenticate");
+			throw new ForbidenResourceException("403 forbidden");
     	}
 	}
 	
@@ -124,9 +133,12 @@ public class FavoriteController {
     		Product product = productRepository.findById(productId)
     				.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found", productId)));
 
-    		Favorite fav = new Favorite(email,productId);
-    		fav.setUser(user);
-    		fav.setProduct(product);
+    		//Favorite fav = new Favorite(email,productId);
+    		//fav.setUser(user);
+    		//fav.setProduct(product);
+    		FavoritePK favFK = new FavoritePK(user.getEmail(),product.getProductId());
+    		Favorite fav = favoriteRepository.findById(favFK)
+    				.orElseThrow(() -> new RecordNotFoundException(String.format("Favorite not found")));
     		
     		favoriteRepository.delete(fav);
     		return fav;

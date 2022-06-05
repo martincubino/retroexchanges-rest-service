@@ -2,7 +2,8 @@ package com.retroexchanges.rest.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-//import java.util.Date;
+import com.retroexchanges.rest.json.UserSecure;
+
 
 /**
  * Created by fjmartincubino
@@ -39,9 +40,6 @@ public class Favorite implements Serializable {
     @JoinColumn(name="productId")
     private Product product;
 
-	public User getUser() {
-		return user;
-	}
 
 	public void setUser(User user) {
 		this.user = user;

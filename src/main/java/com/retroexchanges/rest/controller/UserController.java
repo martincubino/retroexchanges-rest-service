@@ -5,6 +5,8 @@ import com.retroexchanges.rest.exception.RecordNotFoundException;
 import com.retroexchanges.rest.exception.RecordAlreadyExistException;
 import com.retroexchanges.rest.exception.AuthenticationErrorException;
 import com.retroexchanges.rest.exception.ForbidenResourceException;
+import com.retroexchanges.rest.exception.BadRequestException;
+
 import com.retroexchanges.rest.json.Login;
 import com.retroexchanges.rest.json.UserSecure;
 import com.retroexchanges.rest.json.UserToken;
@@ -33,24 +35,28 @@ public class UserController {
 
 	@PostMapping("/login")
 	public UserToken login(@RequestBody Login login) {
+		
+		try {
+			String username = login.getEmail();
+			User user = userRepository.findById(username)
+					.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", username)));
+	
+			String password = user.getPassword();
+			String login_password = login.getPassword();
 
-		String username = login.getEmail();
-		User user = userRepository.findById(username)
-				.orElseThrow(() -> new RecordNotFoundException(String.format("User %s not found", username)));
-
-		String password = user.getPassword();
-		String login_password = login.getPassword();
-
-		if (password.equals(login_password)&&(user.getStatus()==UserStatus.ACTIVE)) {
-			RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
-
-			UserToken userToken = authorization.getJWTToken(user.getEmail(), user.getIsAdmin());
- 			userToken.setIsAdmin(user.getIsAdmin());
-			return userToken;
-
-		} else {
-			throw new AuthenticationErrorException("Failed to authenticate");
+			if (password.equals(login_password)&&(user.getStatus()==UserStatus.ACTIVE)) {
+				RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+				UserToken userToken = authorization.getJWTToken(user.getEmail(), user.getIsAdmin());
+	 			userToken.setIsAdmin(user.getIsAdmin());
+	 			return userToken;
+			}
 		}
+		catch(Exception ex) {
+			throw new BadRequestException("400 Bad request");	
+		}
+	
+		throw new AuthenticationErrorException("Failed to authenticate");
+		
 	}
 
 	@GetMapping("/users")
@@ -134,8 +140,12 @@ public class UserController {
     		user.setSurname(userDetails.getSurname());
     		user.setEmail(userDetails.getEmail());
     		user.setAddress(userDetails.getAddress());
-    		if (!userDetails.getPassword().isEmpty()) {
-    			user.setPassword(userDetails.getPassword());
+    		try {
+	    		if (!userDetails.getPassword().isEmpty()) {
+	    			user.setPassword(userDetails.getPassword());
+	    		}
+    		}catch(Exception ex) {
+    			
     		}
     		user.setNif(userDetails.getNif());
     		UserStatus userStatus =userDetails.getStatus(); 

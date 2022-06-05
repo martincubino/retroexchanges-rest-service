@@ -45,6 +45,8 @@ public class UserSecure implements Serializable{
     	this.setNif(user.getNif());
     	this.setAddress(user.getAddress());
     	this.setStatus(user.getStatus());
+    	this.setCreateAt(user.getCreateAt());
+    	this.setUpdatedAt(user.getUpdatedAt());
     }
     
     public String getName() {
@@ -104,4 +106,16 @@ public class UserSecure implements Serializable{
 	public Double getRating() {
 	 	return this.rating;
 	}
+	public void setCreateAt(Date createAt) {
+		this.createAt = createAt;
+	}
+	public Date getUpdatedAt() {
+		return this.updatedAt;
+	}	
+	public Date getCreateAt() {
+		return this.createAt;
+	}
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}	
 }

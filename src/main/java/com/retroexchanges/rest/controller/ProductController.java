@@ -2,6 +2,7 @@ package com.retroexchanges.rest.controller;
 
 import com.retroexchanges.rest.exception.ForbidenResourceException;
 import com.retroexchanges.rest.exception.RecordNotFoundException;
+import com.retroexchanges.rest.exception.BadRequestException;
 import com.retroexchanges.rest.model.Product;
 import com.retroexchanges.rest.model.Category;
 import com.retroexchanges.rest.repository.ProductRepository;
@@ -73,41 +74,51 @@ public class ProductController {
     @CrossOrigin(origins = "*")
     @PostMapping("/product")
     public Product createProduct(@RequestHeader("authorization") String header, @Valid @RequestBody Product product) throws IOException {
-    	// Solo dejamos dar de alta productos asociados al usuario autenticado
-    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
-    	Claims claims = authorization.decodeToken(header);
-    	String tokenUser = claims.getSubject();
-    	
-    	if (tokenUser.equals(product.getOwner())) {
-    	//Creamos un nuevo producto
-    	Product p = new Product();
-        //Asignamos los valores que nos pasan en el json
-    	p.setName(product.getName());
-        p.setDescription(product.getDescription());
-        p.setStatus(product.getStatus());
-        p.setOwner(product.getOwner());
-        p.setCategory(product.getCategory());
-        p.setPrice(product.getPrice());
-
         //Damos de alta el producto
-        Product newProduct = productRepository.save(p);
-        // Recuperamos el identificador del producto
-        Long productId = newProduct.getProductId();
-        p = productRepository.findById(productId)
-			.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
+        try {
+
+	    	// Solo dejamos dar de alta productos asociados al usuario autenticado
+	    	RetroexchangesAuthorizationFilter authorization = new RetroexchangesAuthorizationFilter();
+	    	Claims claims = authorization.decodeToken(header);
+	    	String tokenUser = claims.getSubject();
+	    	
+	    	if (tokenUser.equals(product.getOwner())) {
+	    	//Creamos un nuevo producto
+	    	Product p = new Product();
+	        //Asignamos los valores que nos pasan en el json
+	    	p.setName(product.getName());
+	        p.setDescription(product.getDescription());
+	        p.setStatus(product.getStatus());
+	        p.setOwner(product.getOwner());
+	        if (product.getCategory()!=null) {
+	        p.setCategory(product.getCategory());
+	        }else {
+	        	throw new BadRequestException("400 Bad request");	
+	        }
+	        p.setPrice(product.getPrice());
+
+        	Product newProduct = productRepository.save(p);
         
-        // Y guardamos las imagenes asociandolas al producto ya dado de alta
-        List<ProductPicture> pictureList = product.getPictureList();
-        for(int index=0;index<pictureList.size();index++) {
-        	ProductPicture productPicture = pictureList.get(index);
-        	productPicture.setProductId(productId);
+	        // Recuperamos el identificador del producto
+	        Long productId = newProduct.getProductId();
+	        p = productRepository.findById(productId)
+				.orElseThrow(() -> new RecordNotFoundException(String.format("Product %d not found",productId)));
+	        
+	        // Y guardamos las imagenes asociandolas al producto ya dado de alta
+	        List<ProductPicture> pictureList = product.getPictureList();
+	        for(int index=0;index<pictureList.size();index++) {
+	        	ProductPicture productPicture = pictureList.get(index);
+	        	productPicture.setProductId(productId);
+	        }
+	        // Guardamos el producto con sus imagenes y lo retornamos al cliente
+	        p.setPictureList(pictureList); 
+	        return productRepository.save(p);
+	    	}else {
+	    		throw new ForbidenResourceException("Forbidden operation");
+	    	}
+    	}catch(Exception ex) {
+        	throw new BadRequestException("400 Bad request");
         }
-        // Guardamos el producto con sus imagenes y lo retornamos al cliente
-        p.setPictureList(pictureList); 
-        return productRepository.save(p);
-    	}else {
-    		throw new ForbidenResourceException("Forbidden operation");
-    	}
     }
     
     @CrossOrigin(origins = "*")
